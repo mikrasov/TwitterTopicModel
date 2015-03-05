@@ -8,8 +8,10 @@
     <meta name="description" content="NS202 - Twitter Topic Modeling Project : ">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>NS202 - Twitter Topic Modeling Project</title>
+	<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/d3_styling.css">
+	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    
+	<title>NS202 - Twitter Topic Modeling Project</title>
   </head>
 
   <body>
@@ -52,6 +54,8 @@
 <h3>Visualization:</h3>
 <p>We will visualize the results by using egocentric networks (egonets hereafter). Given one of the initially sampled users and its 10 neighbors, a topic’s prevalence in the egonet can be depicted by assigning the topic in question a color and consequently coloring nodes in the egonet with a color intensity proportional to how prevalent the topic was in the node’s document. We hope to find that users with high color intensity for some topic A will also have neighbors with relatively high color intensity for the same topic.</p>
 
+<div id="graph-egonet"></div>
+
 <!-- END CONTENT  -->
       </section>
     </div>
@@ -62,7 +66,10 @@
         <p class="copyright">Project  by Elizabeth Forbes, Tegan Brennan, Rafael Melendez, Michael Nekrasov, Roman Kazarin</p>
       </footer>
     </div>
-
-  
+	
+	
+	<script type="text/javascript" src="javascripts/data-egonet.js"></script>
+	<script type="text/javascript" src="javascripts/main.js"></script>
+	
   </body>
 </html>

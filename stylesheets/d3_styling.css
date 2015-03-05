@@ -1,0 +1,9 @@
+.node {
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+
+        .link {
+            stroke: #808080;
+            stroke-opacity: .6;
+        }
