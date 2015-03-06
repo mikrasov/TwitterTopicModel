@@ -1,6 +1,20 @@
 
+var curr_volume;
 
-    var width = 960,
+drawEgoNet(0);
+
+ document.getElementById('egonet-selector').addEventListener('change', function() {
+
+    curr_volume = this.value;
+
+    console.log("curr_volume ", curr_volume);
+	drawEgoNet(0);
+      // now do something with curr_volume
+  });
+  
+  
+  function drawEgoNet(index){
+    var width = 640,
     height = 500,
     radius = 25,
     color = d3.scale.category10();
@@ -9,10 +23,15 @@
         .sort(null)
         .value(function(d) { return d.value; });
 
+	
     var arc = d3.svg.arc()
         .outerRadius(radius)
         .innerRadius(0);
 
+	//Clear past content
+	d3.select("#graph-egonet").html("")
+	
+	
     var svg = d3.select("#graph-egonet").append("svg")
         .attr("width", width)
         .attr("height", height);
@@ -36,6 +55,12 @@
         .enter().append("g")
         .attr("class", "node");
 
+	node.append("text")
+	  .attr("class", "node-label")
+      .attr("dx", 10)
+      .attr("dy", 40)
+      .text(function(d) { console.log(d.name); return d.name });
+	  
     node.selectAll("path")
         .data(function(d, i) {return pie(d.proportions); })
         .enter()
@@ -53,3 +78,6 @@
             .attr("y", function(d) { return d.y; })
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"});
     });
+	}
+	
+	//drawEgoNet(0);

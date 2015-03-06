@@ -2,6 +2,13 @@
             stroke: #fff;
             stroke-width: 1.5px;
         }
+.node-label {
+            alignment-baseline: middle;
+    font-size: 12px;
+    font-family: arial,helvetica,"sans-serif";
+    fill: #393939;
+	stroke: #000;
+        }
 
         .link {
             stroke: #808080;

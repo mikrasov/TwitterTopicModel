@@ -47,6 +47,9 @@
 </p>
 <h4>LDA</h4>
 <p>Latent Dirichlet Association, or LDA, is a topic model used to discover abstract topics that appear in a collection of documents.  It is a generative model in which each document is viewed as a finite mixture over an underlying set of topics and each topic in turn is represented as a multinomial probability distribution over words. The appearance of each word in the document can thus be attributed to one of the document’s topics.  Using LDA, we can obtain the top topics in the Twitter corpus as well as information about how frequently each user tweets about each topic.  We use this frequency to determine which topics a user is interested in.  We will not be implementing LDA ourselves, instead choosing to use the Python package lda.  For this to be effective, we need to be careful about how we choose to preprocess the messy Twitter data.  We plan to remove non-English tweets, hashtags and stop words, and stem the remaining words using the Porter stemmer from Python’s nltk toolkit.  </p>
+
+<p><img src="images/method.png" width="640" /></p>
+
 <h4>Measuring Homophily</h4>
 <p>Once we have each user’s most frequent topics, we will measure homophily between a user and a neighbor by first taking the top three topics of the user and then checking to see if the neighbor’s top three contains at least one of these topics. If it does, we can count this as +1 for homophily; if it doesn’t, we don’t count it at all. After analyzing all of the user’s neighbors we will have a fraction homophily_proportion =  total_neighbors_with_homophily / total_neighbors. After performing this algorithm on every user in our network, we can average all users’ homophily_proportions and get a single fraction which will represent the average measure of homophily across the entire network. We can then say something like: “if the average measure of homophily is < 0.5, we can conclude that users tend to tweet about topics that are different than their neighbors.
 </p>
@@ -54,6 +57,7 @@
 <h3>Visualization:</h3>
 <p>We will visualize the results by using egocentric networks (egonets hereafter). Given one of the initially sampled users and its 10 neighbors, a topic’s prevalence in the egonet can be depicted by assigning the topic in question a color and consequently coloring nodes in the egonet with a color intensity proportional to how prevalent the topic was in the node’s document. We hope to find that users with high color intensity for some topic A will also have neighbors with relatively high color intensity for the same topic.</p>
 
+<input id="egonet-selector" type="range" min="0" max="100" step="1" value="0" width="600"/>
 <div id="graph-egonet"></div>
 
 <!-- END CONTENT  -->
