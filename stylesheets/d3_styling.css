@@ -1,16 +1,16 @@
 .node {
-            stroke: #fff;
-            stroke-width: 1.5px;
-        }
+	stroke: #fff;
+    stroke-width: 0.5px;
+}
 .node-label {
-            alignment-baseline: middle;
+    alignment-baseline: middle;
     font-size: 12px;
     font-family: arial,helvetica,"sans-serif";
     fill: #393939;
 	stroke: #000;
-        }
+}
 
-        .link {
-            stroke: #808080;
-            stroke-opacity: .6;
-        }
+.link {
+	stroke: #808080;
+	stroke-opacity: .6;
+}

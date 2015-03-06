@@ -4,21 +4,31 @@ var curr_volume;
 drawEgoNet(0);
 
  document.getElementById('egonet-selector').addEventListener('change', function() {
-
-    curr_volume = this.value;
-
-    console.log("curr_volume ", curr_volume);
-	drawEgoNet(0);
-      // now do something with curr_volume
+    userIndex = this.value;
+	console.log("Looking at User Index ", userIndex);
+	
+	drawEgoNet(userIndex);
   });
   
   
   function drawEgoNet(index){
+    graph = data_egonet[index];
+	
+	
     var width = 640,
     height = 500,
-    radius = 25,
+    radius = 30,
     color = d3.scale.category10();
 
+	console.log(color);
+	
+	root = graph.nodes[0];
+	root.fixed = true;
+	root.x = width / 2;
+	root.y = height/2;
+
+	
+	
     var pie = d3.layout.pie()
         .sort(null)
         .value(function(d) { return d.value; });
@@ -36,29 +46,30 @@ drawEgoNet(0);
         .attr("width", width)
         .attr("height", height);
 
+	
     var force = d3.layout.force()
-        .charge(-120)
-        .linkDistance(4 * radius)
+        .charge(-400)
+        .linkDistance(5 * radius)
         .size([width, height]);
 
-    force.nodes(data_egonet.nodes)
-         .links(data_egonet.links)
+    force.nodes(graph.nodes)
+         .links(graph.links)
          .start();
 
     var link = svg.selectAll(".link")
-        .data(data_egonet.links)
+        .data(graph.links)
         .enter().append("line")
         .attr("class", "link");
 
     var node = svg.selectAll(".node")
-        .data(data_egonet.nodes)
+        .data(graph.nodes)
         .enter().append("g")
         .attr("class", "node");
 
 	node.append("text")
 	  .attr("class", "node-label")
-      .attr("dx", 10)
-      .attr("dy", 40)
+      .attr("dx", 0)
+      .attr("dy", 50)
       .text(function(d) { console.log(d.name); return d.name });
 	  
     node.selectAll("path")
@@ -74,8 +85,10 @@ drawEgoNet(0);
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; });
 
-        node.attr("x", function(d) { return d.x; })
-            .attr("y", function(d) { return d.y; })
+		
+		node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
+        .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); })
+		
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"});
     });
 	}
