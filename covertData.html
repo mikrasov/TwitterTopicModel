@@ -28,7 +28,7 @@
 
 <script>
 
-	var test = true;
+	var test = false;
 	var testSize = 100;
 	
 function handleFileSelect(evt, id) {
@@ -80,7 +80,7 @@ function readEdges(ldaFile) {
 		edge = objArray[i].split("\t");
 		
 		if(typeof users[edge[0]] !== 'undefined' && typeof users[edge[1]] !== 'undefined'){
-			data.links.push( {"source": users[edge[0]], "target": users[edge[1]], "length": 500, "width": 1} );
+			data.links.push( {"source": users[edge[0]], "target": users[edge[1]]} );
 		}
 
 	}
@@ -93,6 +93,8 @@ var data =
 	nodes:[],
 	links:[]
 };
+
+var dataGraphed;
 
 document.getElementById('file_lda').addEventListener('change', function(evt){handleFileSelect(evt,"#lda");}, false);
 document.getElementById('file_row_map').addEventListener('change', function(evt){handleFileSelect(evt,"#row_map");}, false);
@@ -108,13 +110,22 @@ $("#convertGraph").click(function() {
    
     $("#json").val(str);
 	
-	drawEgoNet( data );
+	dataGraphed = JSON.parse(JSON.stringify(data));
+	
+	
+	drawEgoNet( dataGraphed );
 });
 
 $("#convertJSON").click(function() {
+	for (var i = 0; i < dataGraphed.nodes.length; i++) {
+		data.nodes[i].x = dataGraphed.nodes[i].x;
+		data.nodes[i].y = dataGraphed.nodes[i].y;
+	}
+	
 	var json = JSON.stringify(data);
     var str = json.replace(/},/g, "},\r\n");
    
+   console.log(dataGraphed);
     $("#json").val(str);
 });
 
