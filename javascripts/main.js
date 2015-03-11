@@ -3,7 +3,18 @@ function drawEgoNet(graph, prerender){
     var width = 640,
     height = 500,
     radius = 20,
-    color = d3.scale.category10();
+    color = d3.scale.category10().domain([
+		"Topic 1: ",
+		"Topic 2: ",
+		"Topic 3: ",
+		"Topic 4: ",
+		"Topic 5: ",
+		"Topic 6: ",
+		"Topic 7: ",
+		"Topic 8: ",
+		"Topic 9: ",
+		"Topic 10: "
+	]);
 	
 	//Toggle stores whether the highlighting is on
 	var toggle = 0;
@@ -66,8 +77,12 @@ function drawEgoNet(graph, prerender){
     var svg = svgRoot.append("g")
 		.call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoom))
 		.on("dblclick.zoom", null)
-		
-		
+	
+	
+	
+	verticalLegend = d3.svg.legend().labelFormat("none").cellPadding(5).orientation("vertical").units("Topics").cellWidth(25).cellHeight(18).inputScale(color).cellStepping(10);
+	d3.select("svg").append("g").attr("transform", "translate(15,25)").attr("class", "legend").call(verticalLegend);
+
 	var button = d3.select("#graph-egonet")
     .append("button")
     .text("Fullscreen")
