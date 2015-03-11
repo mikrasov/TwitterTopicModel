@@ -12,37 +12,12 @@ drawEgoNet( data_egonet );
   });
   */
   
-  
-function zoomed() {
-  container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-}
 
-function dragstarted(d) {
-  d3.event.sourceEvent.stopPropagation();
-  d3.select(this).classed("dragging", true);
-}
-
-function dragged(d) {
-  d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-}
-
-function dragended(d) {
-  d3.select(this).classed("dragging", false);
-}
-
-var zoom = d3.behavior.zoom()
-    .scaleExtent([1, 10])
-    .on("zoom", zoomed);
-
-var drag = d3.behavior.drag()
-    .origin(function(d) { return d; })
-    .on("dragstart", dragstarted)
-    .on("drag", dragged)
-    .on("dragend", dragended);
 
 	
 function drawEgoNet(graph){
     
+	
     var width = 640,
     height = 500,
     radius = 20,
@@ -53,7 +28,41 @@ function drawEgoNet(graph){
 	root.x = width / 2;
 	root.y = height/2;
 
+	//Toggle stores whether the highlighting is on
+	var toggle = 0;
+	//Create an array logging what is connected to what
+	var linkedByIndex = {};
+	for (i = 0; i < graph.nodes.length; i++) {
+		linkedByIndex[i + "," + i] = 1;
+	};
+	graph.links.forEach(function (d) {
+		linkedByIndex[d.source + "," + d.target] = 1;
+	});
 	
+	//This function looks up whether a pair are neighbours
+	function neighboring(a, b) {
+		return linkedByIndex[a.index + "," + b.index];
+	}
+
+	function connectedNodes() {
+		if (toggle == 0) {
+			//Reduce the opacity of all but the neighbouring nodes
+			d = d3.select(this).node().__data__;
+			node.style("opacity", function (o) {
+				return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
+			});
+			link.style("opacity", function (o) {
+				return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+			});
+			//Reduce the op
+			toggle = 1;
+		} else {
+			//Put them back to opacity=1
+			node.style("opacity", 1);
+			link.style("opacity", 1);
+			toggle = 0;
+		}
+	}
 	
     var pie = d3.layout.pie()
         .sort(null)
@@ -67,36 +76,52 @@ function drawEgoNet(graph){
 	//Clear past content
 	d3.select("#graph-egonet").html("")
 	
-	
-    var svg = d3.select("#graph-egonet").append("svg")
+	function zoom() {
+		container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+	}
+
+    var svg = d3.select("#graph-egonet").append("svg:svg")
         .attr("width", width)
         .attr("height", height)
-		//.call(zoom);
+		.attr("pointer-events", "all")
+		.append("g")
+		.call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoom))
+		.on("dblclick.zoom", null)
 
+	var rect = svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .style("fill", "none")
+    .style("pointer-events", "all");
+	
+	var container = svg.append("g");
 	
     var force = d3.layout.force()
         .charge(-400)
-        .linkDistance(5 * radius)
+        .linkDistance(8 * radius)
         .size([width, height]);
 
     force.nodes(graph.nodes)
          .links(graph.links)
          .start();
 
-    var link = svg.selectAll(".link")
+
+		 
+    var link = container.selectAll(".link")
         .data(graph.links)
         .enter().append("line")
         .attr("class", "link");
 
-    var node = svg.selectAll(".node")
+    var node = container.selectAll(".node")
         .data(graph.nodes)
         .enter().append("g")
-        .attr("class", "node");
-
+        .attr("class", "node")
+		.on('dblclick', connectedNodes);
+		 
 	node.append("text")
 	  .attr("class", "node-label")
-      .attr("dx", 0)
-      .attr("dy", 50)
+      .attr("dx", -15)
+      .attr("dy", 30)
       .text(function(d) { return d.name });
 	  
     node.selectAll("path")
