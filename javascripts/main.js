@@ -1,33 +1,10 @@
-
-var curr_volume;
-
-drawEgoNet( data_egonet );
-
-/*
- document.getElementById('egonet-selector').addEventListener('change', function() {
-    userIndex = this.value;
-	console.log("Looking at User Index ", userIndex);
-	
-	drawEgoNet( data_egonet[userIndex]);
-  });
-  */
-  
-
-
-	
-function drawEgoNet(graph){
-    
+function drawEgoNet(graph, prerender){
 	
     var width = 640,
     height = 500,
     radius = 20,
     color = d3.scale.category10();
 	
-	root = graph.nodes[0];
-	root.fixed = true;
-	root.x = width / 2;
-	root.y = height/2;
-
 	//Toggle stores whether the highlighting is on
 	var toggle = 0;
 	//Create an array logging what is connected to what
@@ -80,13 +57,32 @@ function drawEgoNet(graph){
 		container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 	}
 
-    var svg = d3.select("#graph-egonet").append("svg:svg")
-        .attr("width", width)
+	var svgRoot = d3.select("#graph-egonet")
+		.append("svg:svg")
+		.attr("width", width)
         .attr("height", height)
 		.attr("pointer-events", "all")
-		.append("g")
+	 
+    var svg = svgRoot.append("g")
 		.call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoom))
 		.on("dblclick.zoom", null)
+		
+		
+	var button = d3.select("#graph-egonet")
+    .append("button")
+    .text("Fullscreen")
+    .attr("float", "left")
+    .on("click", function(){
+		svgRoot.style("position", "fixed")
+		.style("top", 0)
+		.style("bottom", 0)
+		.style("left", 0)
+		.style("right", 0)
+		.style("width", "100%")
+		.style("height", "100%")
+		.style("background-color", "#ffffff")
+		
+	});
 
 	var rect = svg.append("rect")
     .attr("width", width)
@@ -97,16 +93,21 @@ function drawEgoNet(graph){
 	var container = svg.append("g");
 	
     var force = d3.layout.force()
-        .charge(-400)
+        .charge(-800)
+		.gravity(0.1)
+		.linkStrength(0.1)
         .linkDistance(8 * radius)
         .size([width, height]);
 
+	if(prerender){
+		force.theta(0.8)
+	}
+	
+	
     force.nodes(graph.nodes)
          .links(graph.links)
          .start();
 
-
-		 
     var link = container.selectAll(".link")
         .data(graph.links)
         .enter().append("line")
@@ -142,12 +143,6 @@ function drawEgoNet(graph){
 		
 		//.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
         //.attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); })
-		
-            
+		            
     });
-
-	console.log(data_egonet);
 }
-	
-	//drawEgoNet(0);
-	
