@@ -1,26 +1,52 @@
 
 var curr_volume;
 
-drawEgoNet(0);
+drawEgoNet( data_egonet );
 
+/*
  document.getElementById('egonet-selector').addEventListener('change', function() {
     userIndex = this.value;
 	console.log("Looking at User Index ", userIndex);
 	
-	drawEgoNet(userIndex);
+	drawEgoNet( data_egonet[userIndex]);
   });
+  */
   
   
-  function drawEgoNet(index){
-    graph = data_egonet[index];
+function zoomed() {
+  container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
+
+function dragstarted(d) {
+  d3.event.sourceEvent.stopPropagation();
+  d3.select(this).classed("dragging", true);
+}
+
+function dragged(d) {
+  d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+}
+
+function dragended(d) {
+  d3.select(this).classed("dragging", false);
+}
+
+var zoom = d3.behavior.zoom()
+    .scaleExtent([1, 10])
+    .on("zoom", zoomed);
+
+var drag = d3.behavior.drag()
+    .origin(function(d) { return d; })
+    .on("dragstart", dragstarted)
+    .on("drag", dragged)
+    .on("dragend", dragended);
+
 	
-	
+function drawEgoNet(graph){
+    
     var width = 640,
     height = 500,
-    radius = 30,
+    radius = 20,
     color = d3.scale.category10();
-
-	console.log(color);
 	
 	root = graph.nodes[0];
 	root.fixed = true;
@@ -44,7 +70,8 @@ drawEgoNet(0);
 	
     var svg = d3.select("#graph-egonet").append("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+		//.call(zoom);
 
 	
     var force = d3.layout.force()
@@ -70,7 +97,7 @@ drawEgoNet(0);
 	  .attr("class", "node-label")
       .attr("dx", 0)
       .attr("dy", 50)
-      .text(function(d) { console.log(d.name); return d.name });
+      .text(function(d) { return d.name });
 	  
     node.selectAll("path")
         .data(function(d, i) {return pie(d.proportions); })
@@ -86,11 +113,16 @@ drawEgoNet(0);
         .attr("y2", function(d) { return d.target.y; });
 
 		
-		node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
-        .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); })
+		node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"});
 		
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"});
+		//.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
+        //.attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); })
+		
+            
     });
-	}
+
+	console.log(data_egonet);
+}
 	
 	//drawEgoNet(0);
+	
