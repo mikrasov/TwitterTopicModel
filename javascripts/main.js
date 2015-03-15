@@ -4,16 +4,16 @@ function drawEgoNet(graph, prerender){
     height = 500,
     radius = 20,
     color = d3.scale.category10().domain([
-		"Topic 1: ",
-		"Topic 2: ",
-		"Topic 3: ",
-		"Topic 4: ",
-		"Topic 5: ",
-		"Topic 6: ",
-		"Topic 7: ",
-		"Topic 8: ",
-		"Topic 9: ",
-		"Topic 10: "
+		"Topic 0: travel nice site use top great fli check tip digit",
+		"Topic 1: new news world -- say us video music year time",
+		"Topic 2: like go think it' get know one good love see",
+		"Topic 3: get market job affili via home look money d free",
+		"Topic 4: twitter social use media via googl new blog free tweet",
+		"Topic 5: tcot iranelect obama iran post health titl care via polit",
+		"Topic 6: get win follow love mom thank new great kid go",
+		"Topic 7: game sport new time blog true get report blood jet",
+		"Topic 8: lol get like go got lmao shit know love fuck",
+		"Topic 9: thank love quot great follow good life via day make"
 	]);
 	
 	//Toggle stores whether the highlighting is on

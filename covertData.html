@@ -1,9 +1,9 @@
-   <script type="text/javascript" src="javascripts/lib/jquery.min.js"></script>
-   	<script type="text/javascript" src="javascripts/lib/d3.v3.min.js"></script>
+	<script type="text/javascript" src="javascripts/lib/jquery.min.js"></script>
+	<script type="text/javascript" src="javascripts/lib/d3.v3.min.js"></script>
 	<script type="text/javascript" src="javascripts/lib/d3_legend.js"></script>
-   <script type="text/javascript" src="javascripts/data-egonet.js"></script>
-   <script type="text/javascript" src="javascripts/d3_legend.js"></script>
-   <script type="text/javascript" src="javascripts/main.js"></script>
+	<script type="text/javascript" src="javascripts/data-egonet.js"></script>
+	<script type="text/javascript" src="javascripts/d3_legend.js"></script>
+	<script type="text/javascript" src="javascripts/main.js"></script>
    
    
     <p>LDA Matrix:</p>
@@ -13,7 +13,6 @@
 	<p>Row to User Map:</p>
     <textarea id="row_map" class="text" style="width:100%; height: 100px"></textarea><br />
 	<input type="file" id="file_row_map" name="files[]" /><br />
-	
 	
     <p>Edge List:</p>
     <textarea id="edges" class="text" style="width:100%; height: 100px"></textarea><br />
@@ -28,109 +27,105 @@
 	<hr>
 	<div id="graph-egonet"></div>
 	
-
 <script>
-
 	var test = false;
 	var testSize = 100;
 	
-function handleFileSelect(evt, id) {
-    //Retrieve the first (and only!) File from the FileList object
-    var f = evt.target.files[0]; 
+	function handleFileSelect(evt, id) {
+		//Retrieve the first (and only!) File from the FileList object
+		var f = evt.target.files[0]; 
 
-    if (f) {
-      var r = new FileReader();
-      r.onload = function(e) { 
-	      var contents = e.target.result;
-			$(id).val(contents);
+		if (f) {
+		  var r = new FileReader();
+		  r.onload = function(e) { 
+			  var contents = e.target.result;
+				$(id).val(contents);
 
-      }
-      r.readAsText(f);
-    } else { 
-      alert("Failed to load file");
-    }
-}
-
-
-function readLDA(ldaFile) {
-   var objArray = ldaFile.split("\n");
-
-	for (var i = 0; i < objArray.length; i++) {
-		var topics = objArray[i].split(" ");
-		data.nodes[i].proportions = [];
-		for (var k = 0; k < topics.length; k++) {
-			data.nodes[i].proportions[k]  = {"group" : k, "value": Number(topics[k])};
+		  }
+		  r.readAsText(f);
+		} else { 
+		  alert("Failed to load file");
 		}
-		if(test && i>=testSize) break;
 	}
-	
-}
 
-function readRowMap(ldaFile) {
-    var objArray = ldaFile.split("\n");
-	for (var i = 0; i < objArray.length; i++) {
-		data.nodes[i]  = { "name" : objArray[i]};
-		users[objArray[i]] = i;
-		if(test && i>=testSize) break;
+
+	function readLDA(ldaFile) {
+	   var objArray = ldaFile.split("\n");
+
+		for (var i = 0; i < objArray.length; i++) {
+			var topics = objArray[i].split(" ");
+			data.nodes[i].proportions = [];
+			for (var k = 0; k < topics.length; k++) {
+				data.nodes[i].proportions[k]  = {"group" : k, "value": Number(topics[k])};
+				data.topics[k]  += Number(topics[k]);
+			}
+			if(test && i>=testSize) break;
+		}		
 	}
-	
-	console.log(users);
-}
 
-function readEdges(ldaFile) {
-    var objArray = ldaFile.split("\n");
-	for (var i = 0; i < objArray.length; i++) {
-		edge = objArray[i].split("\t");
+	function readRowMap(ldaFile) {
+		var objArray = ldaFile.split("\n");
+		for (var i = 0; i < objArray.length; i++) {
+			data.nodes[i]  = { "name" : objArray[i]};
+			users[objArray[i]] = i;
+			if(test && i>=testSize) break;
+		}
+	}
+
+	function readEdges(ldaFile) {
+		var objArray = ldaFile.split("\n");
+		for (var i = 0; i < objArray.length; i++) {
+			edge = objArray[i].split("\t");
+			
+			if(typeof users[edge[0]] !== 'undefined' && typeof users[edge[1]] !== 'undefined'){
+				data.links.push( {"source": users[edge[0]], "target": users[edge[1]]} );
+			}
+		}
+	}
+
+	var users = {};
+
+	var data = 
+	{
+		topics:[0,0,0,0,0,0,0,0,0,0],
+		nodes:[],
+		links:[]
+	};
+
+	var dataGraphed;
+
+	document.getElementById('file_lda').addEventListener('change', function(evt){handleFileSelect(evt,"#lda");}, false);
+	document.getElementById('file_row_map').addEventListener('change', function(evt){handleFileSelect(evt,"#row_map");}, false);
+	document.getElementById('file_edges').addEventListener('change', function(evt){handleFileSelect(evt,"#edges");}, false);
+	  
+	$("#convertGraph").click(function() {
+		readRowMap($("#row_map").val());
+		readLDA($("#lda").val());
+		readEdges($("#edges").val());
 		
-		if(typeof users[edge[0]] !== 'undefined' && typeof users[edge[1]] !== 'undefined'){
-			data.links.push( {"source": users[edge[0]], "target": users[edge[1]]} );
+		var json = JSON.stringify(data);
+		var str = json.replace(/},/g, "},\r\n");
+	   
+		$("#json").val(str);
+		
+		dataGraphed = JSON.parse(JSON.stringify(data));
+		
+		
+		drawEgoNet( dataGraphed );
+	});
+
+	$("#convertJSON").click(function() {
+		for (var i = 0; i < dataGraphed.nodes.length; i++) {
+			data.nodes[i].x = dataGraphed.nodes[i].x;
+			data.nodes[i].y = dataGraphed.nodes[i].y;
 		}
-
-	}
-}
-
-var users = {};
-
-var data = 
-{
-	nodes:[],
-	links:[]
-};
-
-var dataGraphed;
-
-document.getElementById('file_lda').addEventListener('change', function(evt){handleFileSelect(evt,"#lda");}, false);
-document.getElementById('file_row_map').addEventListener('change', function(evt){handleFileSelect(evt,"#row_map");}, false);
-document.getElementById('file_edges').addEventListener('change', function(evt){handleFileSelect(evt,"#edges");}, false);
-  
-$("#convertGraph").click(function() {
-	readRowMap($("#row_map").val());
-    readLDA($("#lda").val());
-	readEdges($("#edges").val());
-	
-	var json = JSON.stringify(data);
-    var str = json.replace(/},/g, "},\r\n");
-   
-    $("#json").val(str);
-	
-	dataGraphed = JSON.parse(JSON.stringify(data));
-	
-	
-	drawEgoNet( dataGraphed );
-});
-
-$("#convertJSON").click(function() {
-	for (var i = 0; i < dataGraphed.nodes.length; i++) {
-		data.nodes[i].x = dataGraphed.nodes[i].x;
-		data.nodes[i].y = dataGraphed.nodes[i].y;
-	}
-	
-	var json = JSON.stringify(data);
-    var str = json.replace(/},/g, "},\r\n");
-   
-   console.log(dataGraphed);
-    $("#json").val(str);
-});
+		
+		var json = JSON.stringify(data);
+		var str = json.replace(/},/g, "},\r\n");
+	   
+	   console.log(dataGraphed);
+		$("#json").val(str);
+	});
 
 </script>
 	</body>
