@@ -11,6 +11,6 @@
 }
 
 .link {
+	weight: 50px;
 	stroke: #808080;
-	stroke-opacity: .6;
 }

@@ -83,11 +83,20 @@ function drawEgoNet(graph, prerender){
 	verticalLegend = d3.svg.legend().labelFormat("none").cellPadding(5).orientation("vertical").units("Topics").cellWidth(25).cellHeight(18).inputScale(color).cellStepping(10);
 	d3.select("svg").append("g").attr("transform", "translate(15,25)").attr("class", "legend").call(verticalLegend);
 
+	
+	var rect = svg.append("rect")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .style("fill", "none")
+    .style("pointer-events", "all");
+	
+	
 	var button = d3.select("#graph-egonet")
     .append("button")
     .text("Fullscreen")
     .attr("float", "left")
     .on("click", function(){
+	
 		svgRoot.style("position", "fixed")
 		.style("top", 0)
 		.style("bottom", 0)
@@ -96,37 +105,34 @@ function drawEgoNet(graph, prerender){
 		.style("width", "100%")
 		.style("height", "100%")
 		.style("background-color", "#ffffff")
+		.style("z-index", "99");
 		
 	});
-
-	var rect = svg.append("rect")
-    .attr("width", width)
-    .attr("height", height)
-    .style("fill", "none")
-    .style("pointer-events", "all");
 	
 	var container = svg.append("g");
 	
+	
     var force = d3.layout.force()
-        .charge(-800)
+        .charge(-1000)
 		.gravity(0.1)
-		.linkStrength(0.1)
-        .linkDistance(8 * radius)
+		.linkDistance( function(d) { return  20 * radius * d.homophily;  } )
+		.linkStrength(function(d) { return  d.homophily; })
         .size([width, height]);
 
 	if(prerender){
 		force.theta(0.8)
 	}
 	
-	
     force.nodes(graph.nodes)
          .links(graph.links)
          .start();
 
+	var flag = true;
     var link = container.selectAll(".link")
         .data(graph.links)
         .enter().append("line")
-        .attr("class", "link");
+        .attr("class", "link")
+		.style("opacity", function(d) { return  d.homophily; if(flag){console.log(d); flag=false;} } );
 
     var node = container.selectAll(".node")
         .data(graph.nodes)
