@@ -4,7 +4,8 @@
 	<script type="text/javascript" src="javascripts/data-egonet.js"></script>
 	<script type="text/javascript" src="javascripts/main.js"></script>
    
-   
+   <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/d3_styling.css">
+	
     <p>LDA Matrix:</p>
     <textarea id="lda" class="text" style="width:100%; height: 100px"></textarea><br />
 	<input type="file" id="file_lda" name="files[]" /><br />
@@ -18,7 +19,7 @@
 	<input type="file" id="file_edges" name="files[]" /><br />
 	
 	<hr>
-	<button id="convertGraph">Convert To Graph</button><button id="convertJSON">Update with Locations</button><br>
+	<button id="convertGraph">Convert To Graph</button><button id="convertJSON">Update with Locations</button><button id="convertForceSimStop">Stop Physics Sim</button><button id="convertForceSim">Continue Physics Sim</button><br>
 
 	<p>JSON:</p>
 	<textarea id="json" class="text" style="width:100%; height: 100px"></textarea>
@@ -27,7 +28,7 @@
 	<div id="graph-egonet"></div>
 	
 <script>
-	var test = true;
+	var test = false;
 	var testSize = 200;
 	
 	function handleFileSelect(evt, id) {
@@ -65,7 +66,7 @@
 	function readRowMap(ldaFile) {
 		var objArray = ldaFile.split("\n");
 		for (var i = 0; i < objArray.length; i++) {
-			data.nodes[i]  = { "name" : objArray[i]};
+			data.nodes[i]  = { "name" : objArray[i], "degree": 0 };
 			users[objArray[i]] = i;
 			if(test && i>=testSize) break;
 		}
@@ -78,6 +79,9 @@
 			
 			if(typeof users[edge[0]] !== 'undefined' && typeof users[edge[1]] !== 'undefined'){
 				data.links.push( {"source": users[edge[0]], "target": users[edge[1]], "homophily":edge[2]} );
+				
+				data.nodes[users[edge[0]]].degree++;
+				data.nodes[users[edge[1]]].degree++;
 			}
 		}
 	}
@@ -97,6 +101,7 @@
 	document.getElementById('file_row_map').addEventListener('change', function(evt){handleFileSelect(evt,"#row_map");}, false);
 	document.getElementById('file_edges').addEventListener('change', function(evt){handleFileSelect(evt,"#edges");}, false);
 	  
+	var force;
 	$("#convertGraph").click(function() {
 		readRowMap($("#row_map").val());
 		readLDA($("#lda").val());
@@ -110,9 +115,17 @@
 		dataGraphed = JSON.parse(JSON.stringify(data));
 		
 		
-		drawEgoNet( dataGraphed );
+		force = drawEgoNet( dataGraphed );
+	});
+	
+	$("#convertForceSim").click(function() {
+		force.start();
 	});
 
+	$("#convertForceSimStop").click(function() {
+		force.stop();
+	});
+	
 	$("#convertJSON").click(function() {
 		for (var i = 0; i < dataGraphed.nodes.length; i++) {
 			data.nodes[i].x = dataGraphed.nodes[i].x;
@@ -127,5 +140,3 @@
 	});
 
 </script>
-	</body>
-</html>

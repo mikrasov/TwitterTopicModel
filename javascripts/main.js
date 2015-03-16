@@ -127,12 +127,14 @@ function drawEgoNet(graph, prerender){
          .links(graph.links)
          .start();
 
-	var flag = true;
+
     var link = container.selectAll(".link")
         .data(graph.links)
         .enter().append("line")
         .attr("class", "link")
-		.style("opacity", function(d) { return  d.homophily; if(flag){console.log(d); flag=false;} } );
+		.style("stroke-width", function(d) { return  ((2*d.homophily)) +"px"; } )
+		//.style("opacity", function(d) { return  d.homophily; } )
+
 
     var node = container.selectAll(".node")
         .data(graph.nodes)
@@ -144,7 +146,8 @@ function drawEgoNet(graph, prerender){
 	  .attr("class", "node-label")
       .attr("dx", -15)
       .attr("dy", 30)
-      .text(function(d) { return d.name });
+	  .style("display", function(d){ return  ((Number(d.degree)>40)? "initial":"none") })
+	  .text(function(d){ return  d.name });
 	  
     node.selectAll("path")
         .data(function(d, i) {return pie(d.proportions); })
@@ -166,4 +169,6 @@ function drawEgoNet(graph, prerender){
         //.attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); })
 		            
     });
+	
+	return force;
 }

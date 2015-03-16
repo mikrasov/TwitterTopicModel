@@ -73,6 +73,9 @@
       </footer>
     </div>
 		
-	<script>drawEgoNet( data_egonet,  false );</script>
+	<script>
+			var force = drawEgoNet( data_egonet,  false );
+			setInterval(function(){ force.stop(); }, 1000)
+	</script>
   </body>
 </html>

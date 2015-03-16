@@ -8,9 +8,10 @@
     font-family: arial,helvetica,"sans-serif";
     fill: #393939;
 	stroke: #000;
+	z-index: 20;
 }
 
 .link {
-	weight: 50px;
-	stroke: #808080;
+
+	stroke: #999;
 }
