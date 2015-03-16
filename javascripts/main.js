@@ -115,9 +115,9 @@ function drawEgoNet(graph, prerender){
     var force = d3.layout.force()
         .charge(-1000)
 		.gravity(0.1)
-		.linkDistance( function(d) { return  20 * radius * d.homophily;  } )
-		.linkStrength(function(d) { return  d.homophily; })
-        .size([width, height]);
+		.linkDistance( function(d) { return  10 * radius * d.homophily;  } )
+		//.linkStrength(function(d) { return  0.5 * d.homophily; })
+        .size([width*3, height*3]);
 
 	if(prerender){
 		force.theta(0.8)
@@ -140,14 +140,28 @@ function drawEgoNet(graph, prerender){
         .data(graph.nodes)
         .enter().append("g")
         .attr("class", "node")
+		.on("mouseover", function(d) {
+			d3.select(this).classed({'isFocus': true})
+			d3.select(this).select('.node-label').style("display", "initial" )
+		})
+		.on("mouseout", function() {
+			d3.select(this).classed({'isFocus': false})
+			d3.select(this).select('.node-label').style("display", function(d){ return  ((Number(d.degree)>40)? "initial":"none") })
+		})
 		.on('dblclick', connectedNodes);
 		 
 	node.append("text")
 	  .attr("class", "node-label")
-      .attr("dx", -15)
+      .attr("dx", -50)
       .attr("dy", 30)
 	  .style("display", function(d){ return  ((Number(d.degree)>40)? "initial":"none") })
 	  .text(function(d){ return  d.name });
+	  
+	node.append("text")
+	  .attr("class", "node-degree")
+      .attr("dx", -20)
+      .attr("dy", 50)
+	  .text(function(d){ return  "Degree:"+Number(d.degree) });
 	  
     node.selectAll("path")
         .data(function(d, i) {return pie(d.proportions); })
@@ -165,8 +179,6 @@ function drawEgoNet(graph, prerender){
 		
 		node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"});
 		
-		//.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
-        //.attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); })
 		            
     });
 	

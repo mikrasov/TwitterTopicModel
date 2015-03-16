@@ -4,14 +4,33 @@
 }
 .node-label {
     alignment-baseline: middle;
-    font-size: 12px;
+    font-size: 20px;
     font-family: arial,helvetica,"sans-serif";
     fill: #393939;
 	stroke: #000;
 	z-index: 20;
 }
 
-.link {
+.node-degree{
+    display: none
+}
 
+.link {
 	stroke: #999;
+}
+
+
+.isFocus  {
+	stroke: #f3f;
+	display: initial;
+}
+
+.isFocus  .node-degree{
+	display: initial;
+    alignment-baseline: middle;
+    font-size: 12px;
+    font-family: arial,helvetica,"sans-serif";
+    fill: #393939;
+	stroke: #000;
+	z-index: 20;
 }
