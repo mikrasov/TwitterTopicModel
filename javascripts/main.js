@@ -4,16 +4,16 @@ function drawEgoNet(graph, prerender){
     height = 500,
     radius = 20,
     color = d3.scale.category10().domain([
-		"Topic 0: travel nice site use top great fli check tip digit",
-		"Topic 1: new news world -- say us video music year time",
-		"Topic 2: like go think it' get know one good love see",
-		"Topic 3: get market job affili via home look money d free",
-		"Topic 4: twitter social use media via googl new blog free tweet",
-		"Topic 5: tcot iranelect obama iran post health titl care via polit",
-		"Topic 6: get win follow love mom thank new great kid go",
-		"Topic 7: game sport new time blog true get report blood jet",
-		"Topic 8: lol get like go got lmao shit know love fuck",
-		"Topic 9: thank love quot great follow good life via day make"
+		"Topic 0: thank love quot via great follow good day life twitter",
+		"Topic 1: iranelect iran via use india d buy p green car",
+		"Topic 2: new thank blog food bit post ; week look x",
+		"Topic 3: lol get like got go shit lmao know good need",
+		"Topic 4: get free site win nice check new market affili list",
+		"Topic 5: new news game sport music blog report video event time",
+		"Topic 6: like get go think it' one know good love time",
+		"Topic 7: twitter new post social media use via blog googl tweet",
+		"Topic 8: lol new love thank fuck rob pic get ; follow",
+		"Topic 9: tcot health obama news care new say us polit hous"
 	]);
 	
 	//Toggle stores whether the highlighting is on
@@ -115,8 +115,8 @@ function drawEgoNet(graph, prerender){
     var force = d3.layout.force()
         .charge(-1000)
 		.gravity(0.1)
-		.linkDistance( function(d) { return  10 * radius * d.homophily;  } )
-		//.linkStrength(function(d) { return  0.5 * d.homophily; })
+		.linkDistance( function(d) { return  10 * radius;  } )
+		.linkStrength(function(d) { return  0.5 * d.homophily; })
         .size([width*3, height*3]);
 
 	if(prerender){
