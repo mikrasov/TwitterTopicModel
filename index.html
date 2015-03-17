@@ -44,23 +44,51 @@
 <p>In the context of social networks, topic modeling can be useful in terms of elucidating network structure based on shared interests, or homophily.  Homophily between players in a social network has been measured in a multitude of ways.  For example, in order to understand the patterns of collaboration between academics at Stanford University over time, Dahlander and McFarland used similarity measures to correlate their co-citations with status variables: gender, age, ethnicity, and tenure status.  They found that homophily was a major driver of collaborations between academics (Dahlander and McFarland 2013).  Topic modeling, however, affords another potential facet for analysis.  Instead of measuring homophily using demographic features, topic modeling can be used to determine whether shared topic interests influence bonds in social networks.  For example, are people who are friends on Facebook more likely to post about similar topics, in terms of politics, musical taste, etc?</p>
 <p>The Twitter network provides a novel social landscape in which to measure homophily.  Created in 2006, Twitter is a platform for sharing information using messages of 140 characters or less.  Twitter users can form ties by ‘following’ each other, receiving updates on the tweets of their network members, and sharing their own tweets with their network.  The question thus arises: does social network theory regarding homophily hold true in the Twitterverse?  Do ties on twitter mean that users share common interests, i.e. do they tweet about the same topics as their connections do?  We aim to answer this question by using Latent Dirichclet Allocation, or LDA, which is a popular algorithm for topic modeling, to determine the most frequent topics that Twitter users tweet about.  We will then compare each user’s most frequent topics with those of their neighbors in order to confirm or deny the existence of homophily in the Twitterverse.  We expect to see considerable homophily between a user and the members of their one-hop network.</p>
 
+
 <h3>Methods:</h3>
 <h4>Data and Sampling:</h4>
-<p>We will use the SNAP Twitter dataset from Stanford for the project. The dataset contains a sample of 476 million tweets from roughly 17 million users from June to December of 2009. Since topic models such as LDA work with a corpus of documents, we will transform the set of tweets into documents by aggregating them per user to create user documents. Rather than performing topic modeling over a corpus representing the entire dataset, we will work on a subset of the data determined as follows. We will first limit ourselves to users that have at least 100 tweets and 10 neighbors - where a neighbor is either a follower or a followee. From this subset of users, we will randomly sample 100. For each of these 100 users, we will then proceed to randomly sample about 10 neighbors, for an upper bound of 1100 unique sampled users. Finally, for each user in this final sample list, we will randomly sample 100 of their tweets from the SNAP dataset to create the corpus on which we will perform topic modeling (LDA).
-</p>
+<p>We used the SNAP Twitter dataset from Stanford for the project. The dataset contains a sample of 476 million tweets from roughly 17 million users from June to December of 2009. Since topic models such as LDA work with a corpus of documents, we transformed the set of tweets into documents by aggregating them per user to create user documents. Rather than performing topic modeling over a corpus representing the entire dataset, we worked on a subset of the data.</p>
+<p>Because our dataset also contained tweets in languages other than English, we first created a reduced dataset of English language tweets. We then limited ourselves to users who had at least 1000 tweets in this new set, and at least 10 neighbors in the network - where a neighbor is either a follower or a followee. From this subset of users, we randomly samples 110. For each of these 110 users, we then proceeded to randomly sample 20 of their neighbors neighbors, for a total of 1057 sampled users. Finally, for each user in this final sample list, we randomly sampled 1000 of their tweets in English to create the corpus on which we performed topic modeling (LDA).</p>
+
 <h4>LDA</h4>
-<p>Latent Dirichlet Association, or LDA, is a topic model used to discover abstract topics that appear in a collection of documents.  It is a generative model in which each document is viewed as a finite mixture over an underlying set of topics and each topic in turn is represented as a multinomial probability distribution over words. The appearance of each word in the document can thus be attributed to one of the document’s topics.  Using LDA, we can obtain the top topics in the Twitter corpus as well as information about how frequently each user tweets about each topic.  We use this frequency to determine which topics a user is interested in.  We will not be implementing LDA ourselves, instead choosing to use the Python package lda.  For this to be effective, we need to be careful about how we choose to preprocess the messy Twitter data.  We plan to remove non-English tweets, hashtags and stop words, and stem the remaining words using the Porter stemmer from Python’s nltk toolkit.  </p>
+<p>Latent Dirichlet Association, or LDA, is a topic model used to discover abstract topics that appear in a collection of documents.  It is a generative model in which each document is viewed as a finite mixture over an underlying set of topics and each topic in turn is represented as a multinomial probability distribution over words. The appearance of each word in the document can thus be attributed to one of the document’s topics.  We used the python package LDA in order to run LDA on our Twitter dataset. This allowed us to obtain the top topics in the corpus as well as information about how frequently each user tweets about each topic.  We used this frequency to determine which topics are of most interest to a user.  In order to effectively run LDA, we needed to be careful about how we represented our data which included how we choose to preprocess the messy tweets. After stripping punctuation from words, we removed urls and stopwords from our dataset using a list from the NLTK toolkit as well as our own set of words generated from our observations of the tweets. We then stemmed the remaining words using the Porter stemmer. Running LDA on this preprocessed data, we were able to obtain which topics which most interested each Twitter user. Examples of the topics generated are shown below. We experimented with different choices for the number of topics in order to generate the best results.</p>
 
 <p><img src="images/method.png" width="640" /></p>
 
 <h4>Measuring Homophily</h4>
-<p>Once we have each user’s most frequent topics, we will measure homophily between a user and a neighbor by first taking the top three topics of the user and then checking to see if the neighbor’s top three contains at least one of these topics. If it does, we can count this as +1 for homophily; if it doesn’t, we don’t count it at all. After analyzing all of the user’s neighbors we will have a fraction homophily_proportion =  total_neighbors_with_homophily / total_neighbors. After performing this algorithm on every user in our network, we can average all users’ homophily_proportions and get a single fraction which will represent the average measure of homophily across the entire network. We can then say something like: “if the average measure of homophily is < 0.5, we can conclude that users tend to tweet about topics that are different than their neighbors.
-</p>
+<p>Once we have each user’s most frequent topics, we will measure homophily between a user and a neighbor by first taking the top three topics of the user and then checking to see if the neighbor’s top three contains at least one of these topics. If it does, we can count this as +1 for homophily; if it doesn’t, we don’t count it at all. After analyzing all of the user’s neighbors we will have a fraction homophily_proportion =  total_neighbors_with_homophily / total_neighbors. After performing this algorithm on every user in our network, we can average all users’ homophily_proportions and get a single fraction which will represent the average measure of homophily across the entire network. We can then say something like: “if the average measure of homophily is < 0.5, we can conclude that users tend to tweet about topics that are different than their neighbors</p>
 
 <h3>Visualization:</h3>
-<p>We will visualize the results by using egocentric networks (egonets hereafter). Given one of the initially sampled users and its 10 neighbors, a topic’s prevalence in the egonet can be depicted by assigning the topic in question a color and consequently coloring nodes in the egonet with a color intensity proportional to how prevalent the topic was in the node’s document. We hope to find that users with high color intensity for some topic A will also have neighbors with relatively high color intensity for the same topic.</p>
+<p>We visualize the results by extending on the concept of egocentric networks (egonets hereafter). We depict the breakdown of content a user tweets by using a pie chart to represent the proportion of each topic for the content a user posts. A user following another is represented as an undirected edge forming a graph.The topics are consistently colored and the homophiliy between users can be examined by observing the difference in topic ratios between the connected neighbors. Users with high homophiliy would theoretically have similar pie chart breakdowns.</p>
+<p>The visualization uses the <a href="http://d3js.org/">D3 javascript library</a> for web based visualization. To layout the nodes we use a force layout for positioning the nodes. To reduce load time for the user, we pre-run the physics simulation and save the result as the initial state for the interactive web version. To accommodate the large number of nodes we implemented panning and zooming. So that users can examine the homophiliy of a particular neighborhood, we allow users to doubleclick on a particular node to isolate it and the neighbors. </p>
 
 <div id="graph-egonet"></div>
+
+<li>
+	<ul><strong>Zoom:</strong> Mouse Wheel </ul>
+	<ul><strong>Pan:</strong> Click and drag </ul>
+	<ul><strong>Isolate Neighberhood:</strong> double click node </ul>
+	<ul><strong>More Info:</strong> Hover over node, shows total degree, along with homophily ratio to neighbors </ul>
+	<ul><strong>Fullscreen:</strong> Button bellow graph, to exit refresh the page </ul>
+</li>
+
+
+<h3>Metrics</h3>
+<p>To study homophily we investigated multiple metrics for comparing the homophily of neighbors</p>
+
+<h4>Binary Homophily</h4>
+<p>The number of neighbors who have at least one top topic in common with the user divided by the total number of neighbors.</p>
+<p><img src="images/binary-homophily_500.jpg" width="640" /></p>
+
+<h4>Kullback Leibler</h4>
+<p>Measures the difference between two probability distributions.</p>
+<p><img src="images/kullback_leibler_500.jpg" width="640" /></p>
+
+<h4>Ratio Homophily</h4>
+<p>The average ratio of number of top topics in common to total number of top topics, over all neighbors.</p>
+<p><img src="images/ratio-homophily_500.jpg" width="640" /></p>
+
+
 
 <!-- END CONTENT  -->
       </section>
