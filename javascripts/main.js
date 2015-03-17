@@ -1,19 +1,21 @@
+var fullscreen;
+
 function drawEgoNet(graph, prerender){
 	
     var width = 640,
     height = 500,
     radius = 20,
     color = d3.scale.category10().domain([
-		"Topic 0: thank love quot via great follow good day life twitter",
-		"Topic 1: iranelect iran via use india d buy p green car",
-		"Topic 2: new thank blog food bit post ; week look x",
-		"Topic 3: lol get like got go shit lmao know good need",
-		"Topic 4: get free site win nice check new market affili list",
-		"Topic 5: new news game sport music blog report video event time",
-		"Topic 6: like get go think it' one know good love time",
-		"Topic 7: twitter new post social media use via blog googl tweet",
-		"Topic 8: lol new love thank fuck rob pic get ; follow",
-		"Topic 9: tcot health obama news care new say us polit hous"
+		"Social: twitter social media via use site googl new blog free",
+		"News: new post news use world -- say titl music video",
+		"Positive: like get go think it one know good time see",
+		"Feel-good: thank love quot follow life via day great lol good",
+		"Violent: lol new fuck love true rob thank blood pic oh",
+		"Politics: tcot iranelect obama health iran care polit via p2 thank",
+		"Home: love mom lol thank get kid new blog post follow",
+		"Expletive: lol get like got go shit lmao know love good",
+		"Business: market get busi job free money make home new time",
+		"Travel: thank travel win new great follow food via free love"
 	]);
 	
 	//Toggle stores whether the highlighting is on
@@ -90,12 +92,7 @@ function drawEgoNet(graph, prerender){
     .style("fill", "none")
     .style("pointer-events", "all");
 	
-	
-	var button = d3.select("#graph-egonet")
-    .append("button")
-    .text("Fullscreen")
-    .attr("float", "left")
-    .on("click", function(){
+	fullscreen = function(){
 	
 		svgRoot.style("position", "fixed")
 		.style("top", 0)
@@ -107,61 +104,71 @@ function drawEgoNet(graph, prerender){
 		.style("background-color", "#ffffff")
 		.style("z-index", "99");
 		
-	});
+	}
+	
+	var button = d3.select("#graph-egonet")
+    .append("button")
+    .text("Fullscreen")
+    .attr("float", "left")
+    .on("click", fullscreen);
 	
 	var container = svg.append("g");
 	
 	
     var force = d3.layout.force()
-        .charge(-1000)
-		.gravity(0.1)
-		.linkDistance( function(d) { return  10 * radius;  } )
-		.linkStrength(function(d) { return  0.5 * d.homophily; })
+        .charge(-10000)
+		.gravity(0.7)
+		.linkDistance( function(d) { return  20 * radius;  } )
+		.linkStrength(function(d) { return  0.8 * d.homophily; })
+		
         .size([width*3, height*3]);
 
-	if(prerender){
-		force.theta(0.8)
-	}
+
 	
     force.nodes(graph.nodes)
          .links(graph.links)
          .start();
 
 
-    var link = container.selectAll(".link")
+    var linkG = container.selectAll(".link")
         .data(graph.links)
-        .enter().append("line")
+        .enter().append("g")
+		
+	var link= linkG.append("line")
         .attr("class", "link")
-		.style("stroke-width", function(d) { return  ((2*d.homophily)) +"px"; } )
+		.style("stroke-width", function(d) { return  ((2*d.homophily)+0.5) +"px"; } )
 		//.style("opacity", function(d) { return  d.homophily; } )
-
+	
+	 var edgelabels = linkG
+        .append('text')
+		.attr("class", "edgelabel")
+		.text(function(d){ return  Math.round(Number(d.homophily) * 100) / 100 });
+        
 
     var node = container.selectAll(".node")
         .data(graph.nodes)
         .enter().append("g")
         .attr("class", "node")
 		.on("mouseover", function(d) {
-			d3.select(this).classed({'isFocus': true})
-			d3.select(this).select('.node-label').style("display", "initial" )
+			d3.select(this).classed({'isFocus': true});
+			d3.select(this).select('.node-label').style("display", "initial" );
+			d = d3.select(this).node().__data__;
+			linkG.select(".edgelabel").style("display", function (o) {
+				return d.index==o.source.index | d.index==o.target.index ? "initial" : "none";
+			});
+			link.style("stroke", function (o) {
+				return d.index==o.source.index | d.index==o.target.index ? "#F00" : "#999";
+			});
 		})
 		.on("mouseout", function() {
 			d3.select(this).classed({'isFocus': false})
-			d3.select(this).select('.node-label').style("display", function(d){ return  ((Number(d.degree)>40)? "initial":"none") })
+			d3.select(this).select('.node-label').style("display", function(d){ return  ((Number(d.degree)>50)? "initial":"none") })
+			link.style("stroke", "#999");
+			linkG.select(".edgelabel").style("display","none");
 		})
 		.on('dblclick', connectedNodes);
 		 
-	node.append("text")
-	  .attr("class", "node-label")
-      .attr("dx", -50)
-      .attr("dy", 30)
-	  .style("display", function(d){ return  ((Number(d.degree)>40)? "initial":"none") })
-	  .text(function(d){ return  d.name });
-	  
-	node.append("text")
-	  .attr("class", "node-degree")
-      .attr("dx", -20)
-      .attr("dy", 50)
-	  .text(function(d){ return  "Degree:"+Number(d.degree) });
+	
 	  
     node.selectAll("path")
         .data(function(d, i) {return pie(d.proportions); })
@@ -170,17 +177,36 @@ function drawEgoNet(graph, prerender){
         .attr("d", arc)
         .attr("fill", function(d, i) { return color(d.data.group); });;
 
+	node.append("text")
+	  .attr("class", "node-label")
+      .attr("dx", -50)
+      .attr("dy", 30)
+	  .style("display", function(d){ return  ((Number(d.degree)>50)? "initial":"none") })
+	  .text(function(d){ return  d.name });
+	  
+	node.append("text")
+	  .attr("class", "node-degree")
+      .attr("dx", -20)
+      .attr("dy", 50)
+	  .text(function(d){ return  "Degree:"+Number(d.degree) });
+	  
     force.on("tick", function() {
         link.attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; });
 
+		edgelabels.attr("x", function(d) { 
+			return (d.target.x + d.source.x)/2;
+			})
+        .attr("y", function(d) { return (d.target.y + d.source.y)/2; }); 
 		
 		node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"});
 		
-		            
+		 
     });
+	
+	
 	
 	return force;
 }

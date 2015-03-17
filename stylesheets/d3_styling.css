@@ -11,6 +11,16 @@
 	z-index: 20;
 }
 
+.edgelabel {
+    alignment-baseline: middle;
+    font-size: 14px;
+    font-family: arial,helvetica,"sans-serif";
+    fill: #393939;
+	stroke: #000;
+	z-index: 20;
+	display: none;
+}
+
 .node-degree{
     display: none
 }
@@ -21,8 +31,11 @@
 
 
 .isFocus  {
-	stroke: #f3f;
+	stroke: #f00;
 	display: initial;
+}
+.isFocus  .node-label {
+	stroke: #f00;
 }
 
 .isFocus  .node-degree{
@@ -30,7 +43,7 @@
     alignment-baseline: middle;
     font-size: 12px;
     font-family: arial,helvetica,"sans-serif";
-    fill: #393939;
-	stroke: #000;
+    fill: #f00;
+	stroke: #f00;
 	z-index: 20;
 }

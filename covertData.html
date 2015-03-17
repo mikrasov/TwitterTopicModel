@@ -25,11 +25,13 @@
 	<textarea id="json" class="text" style="width:100%; height: 100px"></textarea>
 
 	<hr>
-	<div id="graph-egonet"></div>
+	<div id="graph-egonet"  style="display: none;"></div>
+	
+	<div id="force-running" style="color: #00F"></div>
 	
 <script>
-	var test = false;
-	var testSize = 200;
+	var test = true;
+	var testSize = 400;
 	
 	function handleFileSelect(evt, id) {
 		//Retrieve the first (and only!) File from the FileList object
@@ -116,14 +118,20 @@
 		
 		
 		force = drawEgoNet( dataGraphed );
+		$("#force-running").text('Running');
 	});
 	
 	$("#convertForceSim").click(function() {
 		force.start();
+		force.on('end', function() {
+			d3.select("#force-running").text('Stopped').style("color", "#F00");
+		 });
+		d3.select("#force-running").text('Running').style("color", "#0F0");
 	});
 
 	$("#convertForceSimStop").click(function() {
 		force.stop();
+		d3.select("#force-running").text('Stopped').style("color", "#F00");
 	});
 	
 	$("#convertJSON").click(function() {
@@ -138,5 +146,9 @@
 	   console.log(dataGraphed);
 		$("#json").val(str);
 	});
+	
+	d3.select("#force-running").text('Stopped').style("color", "#F00");
+	
+	
 
 </script>
