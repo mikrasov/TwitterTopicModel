@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<!-- https://mikrasov.github.io/TwitterTopicModel/ -->
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="NS202 - Twitter Topic Modeling Project : ">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/d3_styling.css">
+	<script type="text/javascript" src="javascripts/lib/d3.v3.min.js"></script>
+	<script type="text/javascript" src="javascripts/lib/d3_legend.js"></script>
+	<script type="text/javascript" src="javascripts/data-demo.js"></script>
+	<script type="text/javascript" src="javascripts/main.js"></script>
+   
+	<title>NS202 - Twitter Topic Modeling Project</title>
+  </head>
+
+  <body>
+	<div id="graph-egonet"></div>
+	
+	<script>
+			
+			var force = drawEgoNet( data_egonet,  false );
+			fullscreen();
+			setInterval(function(){ force.stop(); }, 1000)
+	</script>
+  </body>
+</html>
