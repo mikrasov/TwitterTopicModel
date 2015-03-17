@@ -55,7 +55,20 @@
 <p><img src="images/method.png" width="640" /></p>
 
 <h4>Measuring Homophily</h4>
-<p>Once we have each user’s most frequent topics, we will measure homophily between a user and a neighbor by first taking the top three topics of the user and then checking to see if the neighbor’s top three contains at least one of these topics. If it does, we can count this as +1 for homophily; if it doesn’t, we don’t count it at all. After analyzing all of the user’s neighbors we will have a fraction homophily_proportion =  total_neighbors_with_homophily / total_neighbors. After performing this algorithm on every user in our network, we can average all users’ homophily_proportions and get a single fraction which will represent the average measure of homophily across the entire network. We can then say something like: “if the average measure of homophily is < 0.5, we can conclude that users tend to tweet about topics that are different than their neighbors</p>
+<p>Using the output from LDA, we are able to map each user to a topic distribution. Using this distribution, we calculate three different metrics for homophily: binary homophily, homophily ratio, and Kullback Leibler Distance. Binary homophily takes each user, and calculates how many neighbors share at least one top-3 topic with the user; this is then divided by the number of neighbors the user has. The homophily ratio is slightly more complex. It takes each user, and sums up the proportion of top-3 topics the user shares with his/her neighbor, for each neighbor; this is then divided by the number of neighbors the user has. Kullback Leibler is a completely different comparison algorithm: it works by measuring the difference between two probability distributions. For both binary homophily and homphily ratio measures, the higher the measure for each user, the more homophilous that user is with his/her neighbors. Kullback Leibler on the other hand is the exact opposite: the lower the measure, the more homophilous a user and his/her neighbors are."</p>
+
+<h4>Binary Homophily</h4>
+<p>The number of neighbors who have at least one top topic in common with the user divided by the total number of neighbors.</p>
+<p><img src="images/binary-homophily500.png" width="640" /></p>
+
+<h4>Kullback Leibler</h4>
+<p>Measures the difference between two probability distributions.</p>
+<p><img src="images/kullback_leibler_500.jpg" width="640" /></p>
+
+<h4>Ratio Homophily</h4>
+<p>The average ratio of number of top topics in common to total number of top topics, over all neighbors.</p>
+<p><img src="images/ratio-homophily500.png" width="640" /></p>
+
 
 <h3>Visualization:</h3>
 <p>We visualize the results by extending on the concept of egocentric networks (egonets hereafter). We depict the breakdown of content a user tweets by using a pie chart to represent the proportion of each topic for the content a user posts. A user following another is represented as an undirected edge forming a graph.The topics are consistently colored and the homophiliy between users can be examined by observing the difference in topic ratios between the connected neighbors. Users with high homophiliy would theoretically have similar pie chart breakdowns.</p>
@@ -72,20 +85,7 @@
 </li>
 
 
-<h3>Metrics</h3>
-<p>To study homophily we investigated multiple metrics for comparing the homophily of neighbors</p>
 
-<h4>Binary Homophily</h4>
-<p>The number of neighbors who have at least one top topic in common with the user divided by the total number of neighbors.</p>
-<p><img src="images/binary-homophily_500.jpg" width="640" /></p>
-
-<h4>Kullback Leibler</h4>
-<p>Measures the difference between two probability distributions.</p>
-<p><img src="images/kullback_leibler_500.jpg" width="640" /></p>
-
-<h4>Ratio Homophily</h4>
-<p>The average ratio of number of top topics in common to total number of top topics, over all neighbors.</p>
-<p><img src="images/ratio-homophily_500.jpg" width="640" /></p>
 
 
 
